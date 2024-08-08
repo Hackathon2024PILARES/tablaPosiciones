@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultar Datos</title>
+    <style>
+        body {
+            background-color: #f0e8da;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        td {
+            background-color: #e9c1a549;
+        }
+        th {
+            color: white;
+            background-color: #75503688;
+        }
+        #logo {
+            width: 300px;
+        }
+        #titulo {
+            color:#74563b
+        }
+        .box{
+            display:flex;
+            flex-direction:column;
+            justify-content: center;
+            align-items: center;
+        }
+        footer{
+            display:flex;
+            flex-direction:column;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <img id = "logo" src = "./imagenes/logohacka.png" alt="logo">
+        <h1 id = titulo >Marcador general</h1>
+        <br>
+        <div class="form">
+            <div id="resultado"></div>
+        </div>
+    </div>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+        import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-database.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD-DM0yFWbFpeIGF3eTSpDo8gOEvitRXkM",
+            authDomain: "pruebahackathon-eea94.firebaseapp.com",
+            projectId: "pruebahackathon-eea94",
+            storageBucket: "pruebahackathon-eea94.appspot.com",
+            messagingSenderId: "743812823032",
+            appId: "1:743812823032:web:0d105ab1c5f02d52e6480d"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        window.addEventListener("load", function() {
+            const dbRef = ref(db);
+            get(child(dbRef, 'user')).then((snapshot) => {
+                if (snapshot.exists()) {
+                    let users = [];
+                    snapshot.forEach(childSnapshot => {
+                        users.push(childSnapshot.val());
+                    });
+
+                    // Ordenar los usuarios por score en orden descendente
+                    users.sort((a, b) => b.score - a.score);
+
+                    // Crear una tabla para mostrar los usuarios
+                    let resultHTML = `<table>
+                                        <tr>
+                                            <th><em>Usuario</em></th>
+                                            <th><em>Puntaje</em></th>
+                                            <th><em>Lugar</em></th>
+                                        </tr>`;
+                    users.forEach(user => {
+                        resultHTML += `<tr>
+                                        <td><b>${user.username}<b/></td>
+                                        <td>${user.score}</td>
+                                        <td>${user.spot}</td>
+                                       </tr>`;
+                    });
+                    resultHTML += `</table>`;
+
+                    document.getElementById("resultado").innerHTML = resultHTML;
+                } else {
+                    document.getElementById("resultado").innerHTML = "No se encontraron usuarios.";
+                }
+            }).catch((error) => {
+                console.error("Error al consultar los datos: ", error);
+                document.getElementById("resultado").innerHTML = "Error al consultar los datos.";
+            });
+        });
+    </script>
+    <br><br>
+    <footer>
+        <img id = "logopilares" src = "imagenes/logopilares.png">
+    </footer>
+</body>
+</html>
